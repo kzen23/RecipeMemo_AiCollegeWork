@@ -28,7 +28,6 @@ RecipeMemoは、料理のレシピを管理するシンプルなWebアプリケ�
 #### レシピ一覧表示
 - 全レシピをカード形式またはリスト形式で表示
 - 料理名、カテゴリ、調理時間、お気に入り状態を表示
-- ページネーション対応（1ページ20件）
 
 #### レシピ詳細表示
 - 料理名
@@ -103,12 +102,12 @@ RecipeMemoは、料理のレシピを管理するシンプルなWebアプリケ�
 | category | string | YES | - | カテゴリ（和食、洋食、中華、その他） |
 | cooking_time | integer | YES | - | 調理時間（分） |
 | servings | integer | YES | - | 何人分 |
-| favorite | boolean | NO | false | お気に入りフラグ |
+| favorite | boolean | YES | - | お気に入りフラグ |
 | image_url | string | YES | - | 画像URL |
 | created_at | datetime | NO | - | 作成日時 |
 | updated_at | datetime | NO | - | 更新日時 |
 
-#### インデックス
+#### インデックス（Phase 2で追加予定）
 
 | カラム名 | 種類 | 目的 |
 |----------|------|------|
@@ -151,7 +150,7 @@ RecipeMemoは、料理のレシピを管理するシンプルなWebアプリケ�
 
 ### データベース
 - 開発環境: SQLite3
-- 本番環境: PostgreSQL または MySQL
+- 本番環境: PostgreSQL または MySQL（検討中）
 
 ### フロントエンド
 - View: ERB
@@ -159,29 +158,31 @@ RecipeMemoは、料理のレシピを管理するシンプルなWebアプリケ�
 - JavaScript: Stimulus（必要に応じて）
 
 ### テスト
-- RSpec
-- FactoryBot
+- Minitest（現在使用中）
+- RSpec（将来的に移行を検討する場合の候補）
 - Capybara（E2Eテスト）
 
 ---
 
 ## 6. 実装の優先順位
 
-### Phase 1: 基本CRUD（最優先）
-1. Railsプロジェクト作成
-2. Recipeモデル作成（scaffold使用）
-3. バリデーション追加
-4. 基本的なビュー調整
-5. テスト作成
+### Phase 1: 基本CRUD（✅ 実装済み）
+1. ✅ Railsプロジェクト作成
+2. ✅ Recipeモデル作成（scaffold使用）
+3. ✅ バリデーション追加
+4. ⏳ 基本的なビュー調整（カスタマイズ可能）
+5. ❌ テスト作成（未着手）
 
-### Phase 2: 検索・フィルタ機能
+### Phase 2: 検索・フィルタ機能（未実装）
 1. 料理名での検索機能
-2. お気に入り機能
+2. お気に入りトグル機能
 3. カテゴリフィルタ機能
+4. ページネーション（1ページ20件程度）
+5. インデックス追加（検索パフォーマンス向上）
 
-### Phase 3: 拡張機能
-1. 画像アップロード機能
-2. UI/UXの改善
+### Phase 3: 拡張機能（未実装）
+1. 画像アップロード機能（Active Storage）
+2. UI/UXの改善（Bootstrap/Tailwind CSS導入）
 3. レスポンシブデザイン対応
 
 ---

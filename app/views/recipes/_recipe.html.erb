@@ -1,42 +1,41 @@
-<div id="<%= dom_id recipe %>">
-  <p>
-    <strong>Name:</strong>
-    <%= recipe.name %>
-  </p>
+<div id="<%= dom_id recipe %>" class="card">
+  <% if recipe.image_url.present? %>
+    <img src="<%= recipe.image_url %>" class="card-img-top" alt="<%= recipe.name %>" style="max-height: 400px; object-fit: cover;">
+  <% end %>
 
-  <p>
-    <strong>Ingredients:</strong>
-    <%= recipe.ingredients %>
-  </p>
+  <div class="card-body">
+    <h2 class="card-title">
+      <%= recipe.name %>
+      <% if recipe.favorite %>
+        <span class="badge bg-warning text-dark">お気に入り</span>
+      <% end %>
+    </h2>
 
-  <p>
-    <strong>Instructions:</strong>
-    <%= recipe.instructions %>
-  </p>
+    <div class="mb-3">
+      <% if recipe.category.present? %>
+        <span class="badge bg-info me-2"><%= recipe.category %></span>
+      <% end %>
+      <% if recipe.cooking_time.present? %>
+        <span class="badge bg-secondary me-2">調理時間: <%= recipe.cooking_time %>分</span>
+      <% end %>
+      <% if recipe.servings.present? %>
+        <span class="badge bg-secondary"><%= recipe.servings %>人分</span>
+      <% end %>
+    </div>
 
-  <p>
-    <strong>Category:</strong>
-    <%= recipe.category %>
-  </p>
+    <div class="mb-3">
+      <h5>材料</h5>
+      <p class="card-text" style="white-space: pre-wrap;"><%= recipe.ingredients %></p>
+    </div>
 
-  <p>
-    <strong>Cooking time:</strong>
-    <%= recipe.cooking_time %>
-  </p>
+    <div class="mb-3">
+      <h5>作り方</h5>
+      <p class="card-text" style="white-space: pre-wrap;"><%= recipe.instructions %></p>
+    </div>
 
-  <p>
-    <strong>Servings:</strong>
-    <%= recipe.servings %>
-  </p>
-
-  <p>
-    <strong>Favorite:</strong>
-    <%= recipe.favorite %>
-  </p>
-
-  <p>
-    <strong>Image url:</strong>
-    <%= recipe.image_url %>
-  </p>
-
+    <div class="text-muted small">
+      <p class="mb-1">作成日時: <%= recipe.created_at.strftime("%Y年%m月%d日 %H:%M") %></p>
+      <p class="mb-0">更新日時: <%= recipe.updated_at.strftime("%Y年%m月%d日 %H:%M") %></p>
+    </div>
+  </div>
 </div>

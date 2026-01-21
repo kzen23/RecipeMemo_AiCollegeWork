@@ -1,14 +1,50 @@
-<p style="color: green"><%= notice %></p>
-
-<h1>Recipes</h1>
-
-<div id="recipes">
-  <% @recipes.each do |recipe| %>
-    <%= render recipe %>
-    <p>
-      <%= link_to "Show this recipe", recipe %>
-    </p>
-  <% end %>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>レシピ一覧</h1>
+  <%= link_to "新しいレシピを作成", new_recipe_path, class: "btn btn-primary" %>
 </div>
 
-<%= link_to "New recipe", new_recipe_path %>
+<% if @recipes.empty? %>
+  <div class="alert alert-info">
+    レシピがまだ登録されていません。新しいレシピを作成してみましょう！
+  </div>
+<% else %>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    <% @recipes.each do |recipe| %>
+      <div class="col">
+        <div class="card h-100">
+          <% if recipe.image_url.present? %>
+            <img src="<%= recipe.image_url %>" class="card-img-top" alt="<%= recipe.name %>" style="height: 200px; object-fit: cover;">
+          <% else %>
+            <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+              <span class="text-white">画像なし</span>
+            </div>
+          <% end %>
+          <div class="card-body">
+            <h5 class="card-title">
+              <%= recipe.name %>
+              <% if recipe.favorite %>
+                <span class="badge bg-warning text-dark">お気に入り</span>
+              <% end %>
+            </h5>
+            <p class="card-text">
+              <% if recipe.category.present? %>
+                <span class="badge bg-info"><%= recipe.category %></span>
+              <% end %>
+            </p>
+            <p class="card-text text-muted small">
+              <% if recipe.cooking_time.present? %>
+                <i class="bi bi-clock"></i> <%= recipe.cooking_time %>分
+              <% end %>
+              <% if recipe.servings.present? %>
+                <i class="bi bi-people"></i> <%= recipe.servings %>人分
+              <% end %>
+            </p>
+          </div>
+          <div class="card-footer">
+            <%= link_to "詳細を見る", recipe, class: "btn btn-sm btn-outline-primary" %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>

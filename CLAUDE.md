@@ -111,6 +111,27 @@ Recipe.where(favorite: true)
 
 ### 1.7 テスト
 
+#### Minitest（現在使用中）
+
+```bash
+# 全テスト実行
+rails test
+
+# モデルテストのみ実行
+rails test:models
+
+# コントローラテストのみ実行
+rails test:controllers
+
+# 特定のテストファイルを実行
+rails test test/models/recipe_test.rb
+
+# 特定の行のテストを実行
+rails test test/models/recipe_test.rb:10
+```
+
+#### RSpec（将来的に移行する場合）
+
 ```bash
 # RSpecのインストール（Gemfileに追加後）
 rails generate rspec:install
@@ -371,7 +392,9 @@ RecipeMemo_AiCollegeWork/
 
 ## 4. テスト方針
 
-### 4.1 モデルテスト
+**注**: 以下の例はRSpecを使用した場合のテスト例です。現在のプロジェクトではMinitestを使用していますが、将来的にRSpecに移行する際の参考としてください。
+
+### 4.1 モデルテスト（RSpec使用時）
 
 ```ruby
 # spec/models/recipe_spec.rb
@@ -406,7 +429,7 @@ RSpec.describe Recipe, type: :model do
 end
 ```
 
-### 4.2 リクエストテスト
+### 4.2 リクエストテスト（RSpec使用時）
 
 ```ruby
 # spec/requests/recipes_spec.rb
@@ -451,7 +474,8 @@ end
 
 3. テスト実行
    ```bash
-   bundle exec rspec
+   rails test
+   # または、RSpec使用時は bundle exec rspec
    ```
 
 4. コミット
@@ -559,6 +583,368 @@ Claude Codeが生成したコードは以下をチェック
 - [RSpec ドキュメント](https://rspec.info/)
 - [Ruby Style Guide](https://rubystyle.guide/)
 - [Rails Style Guide](https://rails.rubystyle.guide/)
+
+---
+
+## 10. プロジェクト固有の情報
+
+### 10.1 現在の技術スタック
+
+このプロジェクトで実際に使用しているバージョン:
+- **Ruby**: 3.2.0
+- **Rails**: 7.1.6
+- **データベース**: SQLite3
+- **フロントエンド**: Hotwire (Turbo Rails, Stimulus)
+- **テストフレームワーク**: Minitest（デフォルト）※RSpecは未導入
+
+### 10.2 実装済みの機能
+
+**Recipeモデル**
+- scaffold で基本的なCRUD機能を実装済み
+- カラム: name, ingredients, instructions, category, cooking_time, servings, favorite, image_url
+- 現在のバリデーション: name, ingredients, instructions の presence、cooking_time と servings の numericality
+
+**ビュー**
+- index.html.erb（一覧）
+- show.html.erb（詳細）
+- new.html.erb（新規作成）
+- edit.html.erb（編集）
+- _form.html.erb（フォーム部分）
+- _recipe.html.erb（レシピ部分テンプレート）
+
+**コントローラ**
+- RecipesController で基本的なCRUD操作を実装
+- JSON API にも対応（respond_to ブロック使用）
+
+### 10.3 Windows環境での開発
+
+このプロジェクトはWindows環境（Git Bash）で開発しています。
+
+#### パスの扱い
+```bash
+# Git Bashではスラッシュを使用
+cd /c/Users/kn022/RecipeMemo/RecipeMemo_AiCollegeWork
+
+# Windowsのパスはバックスラッシュだが、Git Bashでは自動変換される
+# コマンド実行時はスラッシュで統一する
+```
+
+#### サーバー起動時の注意
+```bash
+# Windows環境でサーバーが既に起動している場合
+# タスクマネージャーでruby.exeプロセスを終了するか、
+# 以下のコマンドでPIDを確認して終了
+cat tmp/pids/server.pid
+# PIDを使ってプロセスを終了
+taskkill /PID <PID> /F
+
+# または別のポートで起動
+rails s -p 3001
+```
+
+#### Git Bashでの注意点
+```bash
+# コマンドはLinux形式で実行可能
+rails routes | grep recipes
+
+# ただし、Windowsネイティブのコマンドを使う場合は注意
+# 例: psの代わりにtasklistを使用
+tasklist | findstr ruby
+```
+
+### 10.4 日本語化の設定（実装例）
+
+**注**: 以下は未実装の設定例です。scaffold で生成されたメッセージは現在英語のままですが、日本語化する場合は以下を実施してください。
+
+#### config/application.rb に追加
+```ruby
+module RecipeMemoAiCollegeWork
+  class Application < Rails::Application
+    config.load_defaults 7.1
+
+    # 日本語化設定
+    config.i18n.default_locale = :ja
+    config.time_zone = 'Tokyo'
+  end
+end
+```
+
+#### config/locales/ja.yml を作成
+```yaml
+ja:
+  activerecord:
+    models:
+      recipe: レシピ
+    attributes:
+      recipe:
+        name: 料理名
+        ingredients: 材料
+        instructions: 作り方
+        category: カテゴリ
+        cooking_time: 調理時間
+        servings: 人数
+        favorite: お気に入り
+        image_url: 画像URL
+    errors:
+      messages:
+        blank: を入力してください
+        too_long: は%{count}文字以内で入力してください
+        greater_than: は%{count}より大きい値にしてください
+```
+
+#### コントローラのメッセージを日本語化
+```ruby
+# app/controllers/recipes_controller.rb
+def create
+  @recipe = Recipe.new(recipe_params)
+
+  respond_to do |format|
+    if @recipe.save
+      format.html { redirect_to @recipe, notice: "レシピを作成しました。" }
+      format.json { render :show, status: :created, location: @recipe }
+    else
+      format.html { render :new, status: :unprocessable_entity }
+      format.json { render json: @recipe.errors, status: :unprocessable_entity }
+    end
+  end
+end
+```
+
+### 10.5 モデルの拡張方法（実装例）
+
+**注**: 以下は未実装の拡張例です。現在のRecipeモデルは基本的なバリデーションのみですが、以下のような拡張が可能です。
+
+#### 定数の追加
+```ruby
+class Recipe < ApplicationRecord
+  # カテゴリの選択肢を定数で定義
+  CATEGORIES = %w[和食 洋食 中華 その他].freeze
+
+  validates :category, inclusion: { in: CATEGORIES }, allow_nil: true
+end
+```
+
+#### スコープの追加
+```ruby
+class Recipe < ApplicationRecord
+  # お気に入りのレシピのみ取得
+  scope :favorites, -> { where(favorite: true) }
+
+  # カテゴリで絞り込み
+  scope :by_category, ->(category) { where(category: category) }
+
+  # 最近作成されたものから順に取得
+  scope :recent, -> { order(created_at: :desc) }
+
+  # 調理時間が短い順
+  scope :quick, -> { where.not(cooking_time: nil).order(cooking_time: :asc) }
+end
+```
+
+#### インスタンスメソッドの追加
+```ruby
+class Recipe < ApplicationRecord
+  # お気に入りをトグル
+  def toggle_favorite!
+    update(favorite: !favorite)
+  end
+
+  # 調理時間を分単位で表示
+  def cooking_time_in_minutes
+    return "未設定" if cooking_time.nil?
+    "#{cooking_time}分"
+  end
+
+  # 何人分かを表示
+  def servings_text
+    return "未設定" if servings.nil?
+    "#{servings}人分"
+  end
+end
+```
+
+#### クラスメソッドの追加
+```ruby
+class Recipe < ApplicationRecord
+  # レシピ名で検索
+  def self.search(query)
+    return all if query.blank?
+    where("name LIKE ?", "%#{query}%")
+  end
+
+  # 人気のレシピ（お気に入りが多い順）
+  def self.popular
+    favorites.recent.limit(10)
+  end
+end
+```
+
+### 10.6 JSON API対応
+
+scaffold で生成されたコントローラは JSON API にも対応しています:
+
+```ruby
+# GET /recipes.json でJSON形式のレシピ一覧を取得可能
+# POST /recipes.json でJSON形式でレシピを作成可能
+
+# curlでのテスト例
+curl http://localhost:3000/recipes.json
+
+# JSON形式でレシピを作成
+curl -X POST http://localhost:3000/recipes.json \
+  -H "Content-Type: application/json" \
+  -d '{"recipe":{"name":"カレーライス","ingredients":"カレールー","instructions":"煮込む"}}'
+```
+
+#### Jbuilder ビュー
+- app/views/recipes/index.json.jbuilder
+- app/views/recipes/show.json.jbuilder
+
+これらのファイルでJSON出力形式をカスタマイズ可能
+
+### 10.7 テストフレームワークの選択
+
+現在はRailsデフォルトの**Minitest**を使用しています。
+
+#### Minitestでのテスト実行
+```bash
+# 全テスト実行
+rails test
+
+# モデルテストのみ実行
+rails test:models
+
+# コントローラテストのみ実行
+rails test:controllers
+
+# 特定のテストファイルを実行
+rails test test/models/recipe_test.rb
+```
+
+#### RSpecに移行する場合
+```bash
+# Gemfile に追加
+# group :development, :test do
+#   gem 'rspec-rails', '~> 6.0'
+#   gem 'factory_bot_rails'
+# end
+
+bundle install
+rails generate rspec:install
+
+# 既存のMinitestファイルは削除可能
+# rm -rf test/
+```
+
+### 10.8 開発時のヒント
+
+#### デバッグ
+```ruby
+# コントローラやモデルでデバッグ出力
+Rails.logger.debug "Recipe: #{@recipe.inspect}"
+
+# binding.irbで対話的デバッグ（Rails 7.1）
+def create
+  @recipe = Recipe.new(recipe_params)
+  binding.irb  # ここで処理が止まり、irb起動
+  @recipe.save
+end
+```
+
+#### データのシード（実装例）
+```ruby
+# db/seeds.rb にサンプルデータを追加
+# 注: Recipe::CATEGORIES は未実装のため、実際に使用する場合は先にモデルに定数を追加してください
+10.times do |i|
+  Recipe.create!(
+    name: "レシピ #{i + 1}",
+    ingredients: "材料A、材料B",
+    instructions: "手順1、手順2",
+    category: ["和食", "洋食", "中華", "その他"].sample,
+    cooking_time: rand(10..60),
+    servings: rand(2..4),
+    favorite: [true, false].sample
+  )
+end
+
+# シード実行
+rails db:seed
+```
+
+#### ルーティングのカスタマイズ（実装例）
+```ruby
+# config/routes.rb
+Rails.application.routes.draw do
+  resources :recipes do
+    # お気に入りトグル用のルート追加例
+    member do
+      patch :toggle_favorite
+    end
+
+    # カテゴリ別一覧用のルート追加例
+    collection do
+      get :favorites
+      get 'category/:category', action: :by_category, as: :by_category
+    end
+  end
+
+  root "recipes#index"
+end
+```
+
+### 10.9 よくある追加機能の実装パターン（実装例）
+
+**注**: 以下は未実装の機能例です。Phase 2以降で実装を検討する際の参考としてください。
+
+#### 検索機能の追加
+```ruby
+# app/controllers/recipes_controller.rb
+def index
+  @recipes = if params[:query].present?
+               Recipe.search(params[:query])
+             else
+               Recipe.all
+             end
+end
+
+# app/models/recipe.rb
+scope :search, ->(query) { where("name LIKE ?", "%#{query}%") }
+```
+
+#### ページネーション（kaminari gem使用）
+```ruby
+# Gemfile
+gem 'kaminari'
+
+# app/controllers/recipes_controller.rb
+def index
+  @recipes = Recipe.page(params[:page]).per(10)
+end
+
+# app/views/recipes/index.html.erb
+<%= paginate @recipes %>
+```
+
+#### 画像アップロード（Active Storage使用）
+```bash
+rails active_storage:install
+rails db:migrate
+```
+
+```ruby
+# app/models/recipe.rb
+class Recipe < ApplicationRecord
+  has_one_attached :image
+end
+
+# app/views/recipes/_form.html.erb
+<%= form.file_field :image %>
+
+# app/controllers/recipes_controller.rb
+def recipe_params
+  params.require(:recipe).permit(:name, :ingredients, :instructions, :image)
+end
+```
 
 ---
 

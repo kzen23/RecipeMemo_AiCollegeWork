@@ -1,10 +1,6 @@
-<h1>Editing recipe</h1>
+<div class="mb-4">
+  <h1>レシピの編集</h1>
+  <p class="text-muted"><%= @recipe.name %> の情報を編集できます</p>
+</div>
 
 <%= render "form", recipe: @recipe %>
-
-<br>
-
-<div>
-  <%= link_to "Show this recipe", @recipe %> |
-  <%= link_to "Back to recipes", recipes_path %>
-</div>

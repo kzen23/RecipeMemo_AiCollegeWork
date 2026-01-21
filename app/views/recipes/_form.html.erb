@@ -1,9 +1,8 @@
-<%= form_with(model: recipe) do |form| %>
+<%= form_with(model: recipe, class: "needs-validation") do |form| %>
   <% if recipe.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(recipe.errors.count, "error") %> prohibited this recipe from being saved:</h2>
-
-      <ul>
+    <div class="alert alert-danger">
+      <h5><%= recipe.errors.count %>件のエラーがあります:</h5>
+      <ul class="mb-0">
         <% recipe.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -11,47 +10,55 @@
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :name, style: "display: block" %>
-    <%= form.text_field :name %>
-  </div>
+  <div class="card">
+    <div class="card-body">
+      <div class="mb-3">
+        <%= form.label :name, "料理名", class: "form-label" %>
+        <%= form.text_field :name, class: "form-control", placeholder: "例: カレーライス" %>
+      </div>
 
-  <div>
-    <%= form.label :ingredients, style: "display: block" %>
-    <%= form.text_area :ingredients %>
-  </div>
+      <div class="mb-3">
+        <%= form.label :ingredients, "材料", class: "form-label" %>
+        <%= form.text_area :ingredients, class: "form-control", rows: 5, placeholder: "例:\nじゃがいも 2個\n人参 1本\n玉ねぎ 1個" %>
+      </div>
 
-  <div>
-    <%= form.label :instructions, style: "display: block" %>
-    <%= form.text_area :instructions %>
-  </div>
+      <div class="mb-3">
+        <%= form.label :instructions, "作り方", class: "form-label" %>
+        <%= form.text_area :instructions, class: "form-control", rows: 8, placeholder: "例:\n1. 野菜を切る\n2. 炒める\n3. 煮込む" %>
+      </div>
 
-  <div>
-    <%= form.label :category, style: "display: block" %>
-    <%= form.text_field :category %>
-  </div>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <%= form.label :category, "カテゴリ", class: "form-label" %>
+          <%= form.select :category, ["和食", "洋食", "中華", "その他"], { include_blank: "選択してください" }, class: "form-select" %>
+        </div>
 
-  <div>
-    <%= form.label :cooking_time, style: "display: block" %>
-    <%= form.number_field :cooking_time %>
-  </div>
+        <div class="col-md-3 mb-3">
+          <%= form.label :cooking_time, "調理時間（分）", class: "form-label" %>
+          <%= form.number_field :cooking_time, class: "form-control", placeholder: "30" %>
+        </div>
 
-  <div>
-    <%= form.label :servings, style: "display: block" %>
-    <%= form.number_field :servings %>
-  </div>
+        <div class="col-md-3 mb-3">
+          <%= form.label :servings, "人数", class: "form-label" %>
+          <%= form.number_field :servings, class: "form-control", placeholder: "2" %>
+        </div>
+      </div>
 
-  <div>
-    <%= form.label :favorite, style: "display: block" %>
-    <%= form.check_box :favorite %>
-  </div>
+      <div class="mb-3">
+        <%= form.label :image_url, "画像URL", class: "form-label" %>
+        <%= form.text_field :image_url, class: "form-control", placeholder: "https://example.com/image.jpg" %>
+        <div class="form-text">画像のURLを入力してください（任意）</div>
+      </div>
 
-  <div>
-    <%= form.label :image_url, style: "display: block" %>
-    <%= form.text_field :image_url %>
-  </div>
+      <div class="form-check mb-3">
+        <%= form.check_box :favorite, class: "form-check-input" %>
+        <%= form.label :favorite, "お気に入りに追加", class: "form-check-label" %>
+      </div>
+    </div>
 
-  <div>
-    <%= form.submit %>
+    <div class="card-footer d-flex gap-2">
+      <%= form.submit recipe.new_record? ? "レシピを登録する" : "レシピを更新する", class: "btn btn-primary" %>
+      <%= link_to "キャンセル", recipes_path, class: "btn btn-secondary" %>
+    </div>
   </div>
 <% end %>
