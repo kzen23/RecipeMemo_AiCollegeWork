@@ -5,4 +5,8 @@ class Recipe < ApplicationRecord
   validates :instructions, presence: true
   validates :cooking_time, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
   validates :servings, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
+
+  # スコープ
+  # 料理名で検索（部分一致）
+  scope :search, ->(query) { where("name LIKE ?", "%#{sanitize_sql_like(query)}%") }
 end
