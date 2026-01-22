@@ -46,6 +46,26 @@ class RecipesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to recipes_url
   end
 
+  # 検索機能のテスト
+  test "should search recipes by query" do
+    get recipes_url, params: { query: "カレー" }
+    assert_response :success
+    assert_select "h5.card-title", text: /カレーライス/
+    assert_select "strong", text: "カレー"
+  end
+
+  test "should show all recipes when query is empty" do
+    get recipes_url, params: { query: "" }
+    assert_response :success
+  end
+
+  test "should show no results message when no recipes match" do
+    get recipes_url, params: { query: "存在しない料理名" }
+    assert_response :success
+    assert_select ".alert-info", text: /一致するレシピが見つかりませんでした/
+  end
+
+  # お気に入り機能のテスト
   test "should toggle favorite" do
     recipe = recipes(:one)
     assert_equal false, recipe.favorite
