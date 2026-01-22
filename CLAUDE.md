@@ -652,6 +652,51 @@ rails routes | grep recipes
 tasklist | findstr ruby
 ```
 
+#### Railsコマンドの実行環境
+
+**重要**: このプロジェクトではRubyをuruで管理していますが、Git Bashからはuruが正しく動作しません。
+
+**推奨される使い分け**:
+- **Git操作**: Git Bash を使用
+  ```bash
+  git status
+  git add .
+  git commit -m "message"
+  git push
+  ```
+
+- **Railsコマンド**: cmd.exe または PowerShell を使用
+  ```cmd
+  # サーバー起動
+  rails server
+
+  # コンソール
+  rails console
+
+  # マイグレーション
+  rails db:migrate
+
+  # テスト実行
+  rails test
+
+  # ジェネレータ
+  rails generate model Recipe name:string
+  ```
+
+**Git Bashでどうしても実行したい場合**:
+```bash
+# Ruby/Railsの絶対パスを使用（非推奨）
+/c/Ruby32-x64/bin/ruby bin/rails test
+
+# テスト実行時はSprocketsの並列処理を無効化
+RAILS_MAX_THREADS=1 /c/Ruby32-x64/bin/ruby bin/rails test
+```
+
+**理由**:
+- uruはWindows環境のRubyバージョン管理ツールだが、Git Bash環境では環境変数が正しく設定されない
+- cmd.exeやPowerShellではuruが正常に動作し、`rails`コマンドが直接使用可能
+- Git Bashで絶対パスを使用する方法もあるが、効率が悪く推奨されない
+
 ### 10.4 日本語化の設定（実装例）
 
 **注**: 以下は未実装の設定例です。scaffold で生成されたメッセージは現在英語のままですが、日本語化する場合は以下を実施してください。
