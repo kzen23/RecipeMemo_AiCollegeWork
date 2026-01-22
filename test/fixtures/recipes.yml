@@ -1,21 +1,31 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  name: MyString
-  ingredients: MyText
-  instructions: MyText
-  category: MyString
-  cooking_time: 1
-  servings: 1
+  name: カレーライス
+  ingredients: カレールー、じゃがいも、にんじん
+  instructions: 野菜を切って煮込む
+  category: 和食
+  cooking_time: 30
+  servings: 4
   favorite: false
-  image_url: MyString
+  image_url:
 
 two:
-  name: MyString
-  ingredients: MyText
-  instructions: MyText
-  category: MyString
-  cooking_time: 1
+  name: ハンバーグ
+  ingredients: ひき肉、玉ねぎ、パン粉
+  instructions: 材料を混ぜて焼く
+  category: 洋食
+  cooking_time: 25
+  servings: 2
+  favorite: true
+  image_url:
+
+three:
+  name: チャーハン
+  ingredients: ご飯、卵、ネギ
+  instructions: 炒める
+  category: 中華
+  cooking_time: 10
   servings: 1
-  favorite: false
-  image_url: MyString
+  favorite: true
+  image_url:

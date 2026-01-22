@@ -45,4 +45,23 @@ class RecipesControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to recipes_url
   end
+
+  test "should toggle favorite" do
+    recipe = recipes(:one)
+    assert_equal false, recipe.favorite
+
+    patch toggle_favorite_recipe_url(recipe)
+    recipe.reload
+    assert_equal true, recipe.favorite
+    assert_redirected_to recipes_url
+  end
+
+  test "should get favorites" do
+    get favorites_recipes_url
+    assert_response :success
+
+    # お気に入りのレシピのみが含まれることを確認
+    assert_select "h5.card-title", text: /ハンバーグ/
+    assert_select "h5.card-title", text: /チャーハン/
+  end
 end
