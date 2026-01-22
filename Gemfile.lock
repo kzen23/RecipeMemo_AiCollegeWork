@@ -135,8 +135,7 @@ GEM
     marcel (1.1.0)
     matrix (0.4.3)
     mini_mime (1.1.5)
-    minitest (6.0.1)
-      prism (~> 1.5)
+    minitest (5.26.2)
     msgpack (1.8.0)
     mutex_m (0.3.0)
     net-imap (0.6.2)
@@ -154,7 +153,6 @@ GEM
     pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
-    prism (1.7.0)
     psych (5.3.1)
       date
       stringio
@@ -262,6 +260,7 @@ DEPENDENCIES
   capybara
   importmap-rails
   jbuilder
+  minitest (~> 5.25)
   puma (>= 5.0)
   rails (~> 7.1.6)
   selenium-webdriver
@@ -312,7 +311,7 @@ CHECKSUMS
   marcel (1.1.0)
   matrix (0.4.3)
   mini_mime (1.1.5)
-  minitest (6.0.1)
+  minitest (5.26.2)
   msgpack (1.8.0)
   mutex_m (0.3.0)
   net-imap (0.6.2)
@@ -323,7 +322,6 @@ CHECKSUMS
   nokogiri (1.19.0-x64-mingw-ucrt)
   pp (0.6.3)
   prettyprint (0.2.0)
-  prism (1.7.0)
   psych (5.3.1)
   public_suffix (7.0.2)
   puma (6.6.1)
