@@ -1,5 +1,5 @@
 class RecipesController < ApplicationController
-  before_action :set_recipe, only: %i[ show edit update destroy ]
+  before_action :set_recipe, only: %i[ show edit update destroy toggle_favorite ]
 
   # GET /recipes or /recipes.json
   def index
@@ -59,6 +59,18 @@ class RecipesController < ApplicationController
       format.html { redirect_to recipes_path, notice: "レシピを削除しました。", status: :see_other }
       format.json { head :no_content }
     end
+  end
+
+  # GET /recipes/favorites
+  def favorites
+    @recipes = Recipe.favorites
+    render :index
+  end
+
+  # PATCH /recipes/1/toggle_favorite
+  def toggle_favorite
+    @recipe.toggle_favorite!
+    redirect_to recipes_path, notice: "お気に入りを更新しました。"
   end
 
   private

@@ -9,4 +9,12 @@ class Recipe < ApplicationRecord
   # スコープ
   # 料理名で検索（部分一致）
   scope :search, ->(query) { where("name LIKE ?", "%#{sanitize_sql_like(query)}%") }
+  # お気に入りのレシピのみ取得
+  scope :favorites, -> { where(favorite: true) }
+
+  # インスタンスメソッド
+  # お気に入りをトグル
+  def toggle_favorite!
+    update(favorite: !favorite)
+  end
 end
