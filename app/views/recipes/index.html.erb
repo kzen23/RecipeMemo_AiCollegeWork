@@ -41,7 +41,7 @@
             <% end %>
             カテゴリ「<strong><%= params[:category] %></strong>」
           <% end %>
-          の検索結果: <%= @recipes.count %>件
+          の検索結果: <%= @recipes.total_count %>件
         </span>
         <%= link_to "検索をクリア", recipes_path, class: "btn btn-sm btn-outline-secondary ms-2" %>
       </div>
@@ -109,5 +109,10 @@
         </div>
       </div>
     <% end %>
+  </div>
+
+  <!-- ページネーション -->
+  <div class="d-flex justify-content-center mt-4">
+    <%= paginate @recipes %>
   </div>
 <% end %>

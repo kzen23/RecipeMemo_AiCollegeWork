@@ -6,6 +6,7 @@ class RecipesController < ApplicationController
     @recipes = Recipe.all
     @recipes = @recipes.search(params[:query]) if params[:query].present?
     @recipes = @recipes.by_category(params[:category]) if params[:category].present?
+    @recipes = @recipes.page(params[:page]).per(10)
   end
 
   # GET /recipes/1 or /recipes/1.json
@@ -61,7 +62,7 @@ class RecipesController < ApplicationController
 
   # GET /recipes/favorites
   def favorites
-    @recipes = Recipe.favorites
+    @recipes = Recipe.favorites.page(params[:page]).per(10)
     render :index
   end
 

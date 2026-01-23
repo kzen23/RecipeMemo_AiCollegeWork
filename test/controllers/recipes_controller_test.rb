@@ -109,4 +109,61 @@ class RecipesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h5.card-title", text: /カレーライス/
   end
+
+  # ページネーション機能のテスト
+  test "should paginate recipes" do
+    # 15件のレシピを作成（1ページ10件なので2ページ目が必要）
+    15.times do |i|
+      Recipe.create!(
+        name: "テストレシピ#{i + 1}",
+        ingredients: "材料#{i + 1}",
+        instructions: "作り方#{i + 1}"
+      )
+    end
+
+    # 1ページ目を取得
+    get recipes_url, params: { page: 1 }
+    assert_response :success
+
+    # 2ページ目を取得
+    get recipes_url, params: { page: 2 }
+    assert_response :success
+  end
+
+  test "should limit recipes to 10 per page" do
+    # 15件のレシピを作成
+    15.times do |i|
+      Recipe.create!(
+        name: "テストレシピ#{i + 1}",
+        ingredients: "材料#{i + 1}",
+        instructions: "作り方#{i + 1}"
+      )
+    end
+
+    get recipes_url
+    assert_response :success
+
+    # 1ページに表示されるレシピ数が10件以下であることを確認
+    assert_select ".col", maximum: 10
+  end
+
+  test "should paginate favorites" do
+    # お気に入りのレシピを15件作成
+    15.times do |i|
+      Recipe.create!(
+        name: "お気に入りレシピ#{i + 1}",
+        ingredients: "材料#{i + 1}",
+        instructions: "作り方#{i + 1}",
+        favorite: true
+      )
+    end
+
+    # 1ページ目を取得
+    get favorites_recipes_url, params: { page: 1 }
+    assert_response :success
+
+    # 2ページ目を取得
+    get favorites_recipes_url, params: { page: 2 }
+    assert_response :success
+  end
 end
