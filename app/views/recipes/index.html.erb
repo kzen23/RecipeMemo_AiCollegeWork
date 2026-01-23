@@ -7,8 +7,14 @@
 <div class="card mb-4">
   <div class="card-body">
     <%= form_with url: recipes_path, method: :get, local: true, class: "row g-3" do |form| %>
-      <div class="col-md-10">
+      <div class="col-md-6">
         <%= form.text_field :query, value: params[:query], class: "form-control", placeholder: "料理名で検索..." %>
+      </div>
+      <div class="col-md-4">
+        <%= form.select :category,
+                        options_for_select([["すべてのカテゴリ", ""]] + Recipe::CATEGORIES.map { |c| [c, c] }, params[:category]),
+                        {},
+                        { class: "form-select" } %>
       </div>
       <div class="col-md-2">
         <%= form.submit "検索", class: "btn btn-primary w-100" %>
@@ -23,10 +29,19 @@
       <%= link_to "すべて表示", recipes_path, class: "btn btn-outline-secondary ms-2" %>
     </div>
 
-    <% if params[:query].present? %>
+    <% if params[:query].present? || params[:category].present? %>
       <div class="mt-3">
         <span class="text-muted">
-          「<strong><%= params[:query] %></strong>」の検索結果: <%= @recipes.count %>件
+          <% if params[:query].present? %>
+            「<strong><%= params[:query] %></strong>」
+          <% end %>
+          <% if params[:category].present? %>
+            <% if params[:query].present? %>
+              かつ
+            <% end %>
+            カテゴリ「<strong><%= params[:category] %></strong>」
+          <% end %>
+          の検索結果: <%= @recipes.count %>件
         </span>
         <%= link_to "検索をクリア", recipes_path, class: "btn btn-sm btn-outline-secondary ms-2" %>
       </div>
@@ -36,8 +51,17 @@
 
 <% if @recipes.empty? %>
   <div class="alert alert-info">
-    <% if params[:query].present? %>
-      「<%= params[:query] %>」に一致するレシピが見つかりませんでした。
+    <% if params[:query].present? || params[:category].present? %>
+      <% if params[:query].present? %>
+        「<%= params[:query] %>」
+      <% end %>
+      <% if params[:category].present? %>
+        <% if params[:query].present? %>
+          かつ
+        <% end %>
+        カテゴリ「<%= params[:category] %>」
+      <% end %>
+      に一致するレシピが見つかりませんでした。
     <% else %>
       レシピがまだ登録されていません。新しいレシピを作成してみましょう！
     <% end %>

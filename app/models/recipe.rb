@@ -1,16 +1,22 @@
 class Recipe < ApplicationRecord
+  # 定数
+  CATEGORIES = %w[和食 洋食 中華 その他].freeze
+
   # バリデーション
   validates :name, presence: true, length: { maximum: 100 }
   validates :ingredients, presence: true
   validates :instructions, presence: true
   validates :cooking_time, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
   validates :servings, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
+  validates :category, inclusion: { in: CATEGORIES }, allow_nil: true
 
   # スコープ
   # 料理名で検索（部分一致）
   scope :search, ->(query) { where("name LIKE ?", "%#{sanitize_sql_like(query)}%") }
   # お気に入りのレシピのみ取得
   scope :favorites, -> { where(favorite: true) }
+  # カテゴリで絞り込み
+  scope :by_category, ->(category) { where(category: category) if category.present? }
 
   # インスタンスメソッド
   # お気に入りをトグル

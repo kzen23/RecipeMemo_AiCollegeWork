@@ -101,4 +101,60 @@ class RecipeTest < ActiveSupport::TestCase
     recipe.reload
     assert_equal true, recipe.favorite
   end
+
+  # カテゴリフィルタのテスト
+  test "categoryが有効なカテゴリの場合バリデーションが通ること" do
+    recipe = Recipe.new(
+      name: "料理名",
+      ingredients: "材料",
+      instructions: "手順",
+      category: "和食"
+    )
+    assert recipe.valid?
+  end
+
+  test "categoryが無効なカテゴリの場合バリデーションエラーになること" do
+    recipe = Recipe.new(
+      name: "料理名",
+      ingredients: "材料",
+      instructions: "手順",
+      category: "無効なカテゴリ"
+    )
+    assert_not recipe.valid?
+    assert_includes recipe.errors[:category], "は一覧にありません"
+  end
+
+  test "categoryが空の場合バリデーションが通ること" do
+    recipe = Recipe.new(
+      name: "料理名",
+      ingredients: "材料",
+      instructions: "手順",
+      category: nil
+    )
+    assert recipe.valid?
+  end
+
+  test "by_categoryスコープが指定されたカテゴリのレシピのみを返すこと" do
+    results = Recipe.by_category("和食")
+    assert_includes results, recipes(:one)
+    assert_not_includes results, recipes(:two)
+    assert_not_includes results, recipes(:three)
+    assert_equal 1, results.count
+  end
+
+  test "by_categoryスコープが空文字列の場合全件を返すこと" do
+    results = Recipe.by_category("")
+    assert_equal Recipe.count, results.count
+  end
+
+  test "by_categoryスコープがnilの場合全件を返すこと" do
+    results = Recipe.by_category(nil)
+    assert_equal Recipe.count, results.count
+  end
+
+  test "searchとby_categoryを組み合わせてフィルタリングできること" do
+    results = Recipe.search("カレー").by_category("和食")
+    assert_includes results, recipes(:one)
+    assert_equal 1, results.count
+  end
 end

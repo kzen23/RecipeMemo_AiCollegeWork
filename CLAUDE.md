@@ -113,21 +113,36 @@ Recipe.where(favorite: true)
 
 #### Minitest（現在使用中）
 
+**Windows環境（Git Bash）での実行方法:**
+
 ```bash
-# 全テスト実行
-rails test
+# 全テスト実行（推奨方法）
+RAILS_MAX_THREADS=1 /c/Ruby32-x64/bin/ruby bin/rails test
 
 # モデルテストのみ実行
-rails test:models
+RAILS_MAX_THREADS=1 /c/Ruby32-x64/bin/ruby bin/rails test:models
 
 # コントローラテストのみ実行
-rails test:controllers
+RAILS_MAX_THREADS=1 /c/Ruby32-x64/bin/ruby bin/rails test:controllers
 
 # 特定のテストファイルを実行
-rails test test/models/recipe_test.rb
+RAILS_MAX_THREADS=1 /c/Ruby32-x64/bin/ruby bin/rails test test/models/recipe_test.rb
 
 # 特定の行のテストを実行
-rails test test/models/recipe_test.rb:10
+RAILS_MAX_THREADS=1 /c/Ruby32-x64/bin/ruby bin/rails test test/models/recipe_test.rb:10
+```
+
+**注意事項:**
+- Git Bashでは `uru` が正しく動作しないため、Rubyの絶対パスを使用
+- `RAILS_MAX_THREADS=1` を設定してSprocketsの並列処理を無効化（エラー回避のため）
+- cmd.exe経由での実行は環境によって動作しない場合がある
+
+**cmd.exeまたはPowerShellから実行する場合:**
+
+```cmd
+# uruを使用してRubyバージョンを設定してから実行
+uru 3.2
+rails test
 ```
 
 #### RSpec（将来的に移行する場合）
@@ -657,45 +672,63 @@ tasklist | findstr ruby
 **重要**: このプロジェクトではRubyをuruで管理していますが、Git Bashからはuruが正しく動作しません。
 
 **推奨される使い分け**:
-- **Git操作**: Git Bash を使用
-  ```bash
-  git status
-  git add .
-  git commit -m "message"
-  git push
-  ```
 
-- **Railsコマンド**: cmd.exe または PowerShell を使用
-  ```cmd
-  # サーバー起動
-  rails server
-
-  # コンソール
-  rails console
-
-  # マイグレーション
-  rails db:migrate
-
-  # テスト実行
-  rails test
-
-  # ジェネレータ
-  rails generate model Recipe name:string
-  ```
-
-**Git Bashでどうしても実行したい場合**:
+**方法1: Git Bash で絶対パスを使用（テスト実行時に推奨）**
 ```bash
-# Ruby/Railsの絶対パスを使用（非推奨）
-/c/Ruby32-x64/bin/ruby bin/rails test
-
-# テスト実行時はSprocketsの並列処理を無効化
+# テスト実行（推奨）
 RAILS_MAX_THREADS=1 /c/Ruby32-x64/bin/ruby bin/rails test
+
+# モデルテストのみ
+RAILS_MAX_THREADS=1 /c/Ruby32-x64/bin/ruby bin/rails test:models
+
+# コントローラテストのみ
+RAILS_MAX_THREADS=1 /c/Ruby32-x64/bin/ruby bin/rails test:controllers
+
+# 特定のテストファイル
+RAILS_MAX_THREADS=1 /c/Ruby32-x64/bin/ruby bin/rails test test/models/recipe_test.rb
+```
+
+**注意**:
+- `RAILS_MAX_THREADS=1` を設定してSprocketsの並列処理を無効化（エラー回避のため必須）
+- Git Bash上でテストを実行する際はこの方法が確実に動作する
+
+**方法2: cmd.exe または PowerShell を使用（その他のRailsコマンド）**
+```cmd
+# uruでRubyバージョンを設定
+uru 3.2
+
+# サーバー起動
+rails server
+
+# コンソール
+rails console
+
+# マイグレーション
+rails db:migrate
+
+# テスト実行
+rails test
+
+# ジェネレータ
+rails generate model Recipe name:string
+```
+
+**注意**:
+- cmd.exe経由でのコマンド実行は、環境によっては動作しない場合がある
+- uruが正しく設定されている場合は、直接 `rails` コマンドが使用可能
+
+**Git操作は Git Bash を使用**:
+```bash
+git status
+git add .
+git commit -m "message"
+git push
 ```
 
 **理由**:
 - uruはWindows環境のRubyバージョン管理ツールだが、Git Bash環境では環境変数が正しく設定されない
-- cmd.exeやPowerShellではuruが正常に動作し、`rails`コマンドが直接使用可能
-- Git Bashで絶対パスを使用する方法もあるが、効率が悪く推奨されない
+- Git Bashでの絶対パス使用は、テスト実行において確実に動作する実用的な方法
+- cmd.exeやPowerShellではuruが正常に動作し、`rails`コマンドが直接使用可能（ただし環境による）
 
 ### 10.4 日本語化の設定（実装例）
 

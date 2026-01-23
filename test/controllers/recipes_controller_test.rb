@@ -84,4 +84,29 @@ class RecipesControllerTest < ActionDispatch::IntegrationTest
     assert_select "h5.card-title", text: /ハンバーグ/
     assert_select "h5.card-title", text: /チャーハン/
   end
+
+  # カテゴリフィルタのテスト
+  test "should filter recipes by category" do
+    get recipes_url, params: { category: "和食" }
+    assert_response :success
+    assert_select "h5.card-title", text: /カレーライス/
+    assert_select "strong", text: "和食"
+  end
+
+  test "should show all recipes when category is empty" do
+    get recipes_url, params: { category: "" }
+    assert_response :success
+  end
+
+  test "should show no results message when no recipes match category" do
+    get recipes_url, params: { category: "その他" }
+    assert_response :success
+    assert_select ".alert-info", text: /一致するレシピが見つかりませんでした/
+  end
+
+  test "should filter recipes by both query and category" do
+    get recipes_url, params: { query: "カレー", category: "和食" }
+    assert_response :success
+    assert_select "h5.card-title", text: /カレーライス/
+  end
 end
