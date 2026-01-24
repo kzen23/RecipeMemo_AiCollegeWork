@@ -1026,4 +1026,228 @@ end
 
 ---
 
-最終更新: 2026-01-17
+## 11. デプロイ（デモ・発表会用）
+
+### 11.1 ngrokを使った一時公開
+
+**ngrok**は、ローカルで動作しているアプリケーションを一時的にインターネット上に公開できるツールです。成果発表会やデモなど、短時間の公開に最適です。
+
+#### 特徴
+- **セットアップが簡単**: 5-10分で公開可能
+- **設定変更不要**: SQLite3のまま使用可能
+- **一時的な公開**: 発表会中のみ公開、終了後は停止
+- **無料**: 基本機能は無料で利用可能
+
+#### 制限事項
+- ターミナルを閉じると公開停止
+- URLはランダム生成（無料版）
+- 初回アクセス時に警告画面が表示される場合がある
+
+### 11.2 ngrok セットアップ手順（Windows環境）
+
+#### ステップ1: ngrok のダウンロードと配置
+
+```bash
+# Git Bash で実行
+
+# 一時ディレクトリに移動
+cd /tmp
+
+# ngrok をダウンロード（Windows 64bit版）
+curl -o ngrok.zip https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-windows-amd64.zip
+
+# 解凍
+unzip ngrok.zip
+
+# プロジェクトディレクトリに移動
+cd /c/Users/kn022/RecipeMemo/RecipeMemo_AiCollegeWork
+
+# ngrokをプロジェクトディレクトリにコピー
+cp /tmp/ngrok.exe .
+```
+
+#### ステップ2: ngrok アカウント登録と認証
+
+1. **アカウント作成**
+   - https://dashboard.ngrok.com/signup にアクセス
+   - GoogleアカウントまたはGitHubアカウントでサインアップ（推奨）
+
+2. **認証トークンを取得**
+   - サインアップ後、https://dashboard.ngrok.com/get-started/your-authtoken に自動遷移
+   - 認証トークン（`2xxx...`のような長い文字列）をコピー
+
+3. **認証トークンを設定**
+   ```bash
+   cd /c/Users/kn022/RecipeMemo/RecipeMemo_AiCollegeWork
+
+   # YOUR_AUTH_TOKENの部分を実際のトークンに置き換えて実行
+   ./ngrok config add-authtoken YOUR_AUTH_TOKEN
+   ```
+
+   **重要**: 認証トークンは機密情報です。他人と共有しないでください。
+
+#### ステップ3: Rails設定の追加
+
+ngrokのホストを許可するため、開発環境の設定を変更します（すでに設定済みの場合はスキップ）。
+
+`config/environments/development.rb` の末尾に以下を追加：
+
+```ruby
+# Allow ngrok hosts for demo
+config.hosts << /[a-z0-9-]+\.ngrok-free\.(app|dev)/
+```
+
+### 11.3 発表会当日の起動手順
+
+#### ターミナル1: Railsサーバーを起動
+
+```bash
+cd /c/Users/kn022/RecipeMemo/RecipeMemo_AiCollegeWork
+
+# Railsサーバー起動
+rails s
+```
+
+起動メッセージを確認：
+```
+=> Booting Puma
+=> Rails 7.1.6 application starting in development
+* Listening on http://127.0.0.1:3000
+```
+
+#### ターミナル2: ngrok を起動
+
+別のGit Bashターミナルを開いて：
+
+```bash
+cd /c/Users/kn022/RecipeMemo/RecipeMemo_AiCollegeWork
+
+# ngrok起動
+./ngrok http 127.0.0.1:3000
+```
+
+以下のような画面が表示されます：
+
+```
+ngrok
+
+Session Status    online
+Account           your-account@example.com
+Version           3.x.x
+Region            Japan (jp)
+Latency           -
+Web Interface     http://127.0.0.1:4040
+Forwarding        https://xxxx-xxxx-xxxx.ngrok-free.dev -> http://localhost:3000
+
+Connections       ttl     opn     rt1     rt5     p50     p90
+                  0       0       0.00    0.00    0.00    0.00
+```
+
+**公開URL**: `Forwarding` の行にある `https://xxxx-xxxx-xxxx.ngrok-free.dev` がアプリの公開URLです。
+
+#### ステップ3: 動作確認
+
+1. ブラウザで公開URLにアクセス
+2. レシピ一覧ページが表示されることを確認
+3. 各機能（作成、編集、削除、検索、お気に入り）が動作することを確認
+
+### 11.4 発表会での注意事項
+
+#### 発表前の準備
+- デモ用のレシピデータを登録しておく（3-5件程度）
+- 公開URLをブラウザのブックマークに保存
+- インターネット接続を確認
+
+#### 発表中
+- **両方のターミナルを閉じない**（閉じると公開停止）
+- PCをスリープさせない
+- Wi-Fi接続を維持する
+
+#### 初回アクセス時の警告
+無料版のngrokでは、初回アクセス時に以下のような警告画面が表示される場合があります：
+
+```
+You are about to visit: xxxx.ngrok-free.dev
+which is served by ngrok.io
+Click "Visit Site" to continue
+```
+
+**対処法**: 「Visit Site」ボタンをクリックして進む
+
+### 11.5 トラブルシューティング
+
+#### エラー: `dial tcp [::1]:3000: connectex: No connection could be made`
+
+**原因**: Railsサーバーが起動していない
+
+**対処法**:
+```bash
+# Railsサーバーを起動
+cd /c/Users/kn022/RecipeMemo/RecipeMemo_AiCollegeWork
+rails s
+```
+
+#### エラー: `Blocked hosts: xxx.ngrok-free.dev`
+
+**原因**: Rails設定でngrokのホストが許可されていない
+
+**対処法**: `config/environments/development.rb` に以下を追加後、Railsサーバーを再起動
+```ruby
+config.hosts << /[a-z0-9-]+\.ngrok-free\.(app|dev)/
+```
+
+#### エラー: `authentication failed: Usage of ngrok requires a verified account`
+
+**原因**: ngrokの認証トークンが設定されていない
+
+**対処法**:
+```bash
+./ngrok config add-authtoken YOUR_AUTH_TOKEN
+```
+
+#### 発表中に問題が起きたら
+
+1. **両方のターミナルで Ctrl+C を押して停止**
+2. **Railsサーバーを再起動**: `rails s`
+3. **ngrokを再起動**: `./ngrok http 127.0.0.1:3000`
+4. **新しい公開URLにアクセス**（URLが変わる場合があります）
+
+### 11.6 発表後の後片付け
+
+```bash
+# ngrokを停止（ターミナル2）
+Ctrl+C
+
+# Railsサーバーを停止（ターミナル1）
+Ctrl+C
+```
+
+ターミナルを閉じるだけで公開は完全に停止します。
+
+### 11.7 代替デプロイ方法
+
+時間に余裕がある場合や、永続的なデプロイが必要な場合は以下のプラットフォームを検討してください：
+
+#### Railway（推奨）
+- Railsを公式サポート
+- PostgreSQL自動セットアップ
+- 無料枠あり（月500時間）
+- セットアップ時間: 15-30分
+
+#### Render
+- Railsテンプレート提供
+- PostgreSQL無料枠
+- 自動デプロイ対応
+- セットアップ時間: 20-30分
+
+#### Fly.io
+- Dockerベース
+- 無料枠あり
+- グローバルエッジ対応
+- セットアップ時間: 30-45分
+
+**注意**: これらのプラットフォームはPostgreSQLへの移行が必要です。
+
+---
+
+最終更新: 2026-01-24

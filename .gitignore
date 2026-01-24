@@ -32,3 +32,11 @@
 
 # Ignore all uploaded files
 /public/uploads
+
+# Ignore ngrok executable
+ngrok.exe
+
+# Ignore conversation logs and temporary text files
+conversation-*.txt
+*.txt
+!CLAUDE.md
