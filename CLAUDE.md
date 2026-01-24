@@ -669,30 +669,112 @@ tasklist | findstr ruby
 
 #### Railsコマンドの実行環境
 
-**重要**: このプロジェクトではRubyをuruで管理していますが、Git Bashからはuruが正しく動作しません。
+**重要**: このプロジェクトでは複数のRubyバージョン（3.2と3.4）をuruで管理しています。Git Bashからはuruが正しく動作しないため、エイリアス設定を使用します。
 
-**推奨される使い分け**:
+**推奨方法: Git Bash エイリアス設定（最も簡単）**
 
-**方法1: Git Bash で絶対パスを使用（テスト実行時に推奨）**
+`~/.bash_profile` に以下の設定を追加済み：
+
 ```bash
-# テスト実行（推奨）
+# Ruby installation paths
+export RUBY32_PATH="/c/Ruby32-x64/bin"
+export RUBY34_PATH="/c/Ruby34-x64/bin"
+
+# Ruby 3.2 commands (RecipeMemo project)
+alias ruby32="$RUBY32_PATH/ruby"
+alias rails32="RAILS_MAX_THREADS=1 $RUBY32_PATH/ruby $RUBY32_PATH/rails"
+alias bundle32="$RUBY32_PATH/bundle"
+alias rake32="$RUBY32_PATH/rake"
+
+# Ruby 3.4 commands (other learning projects)
+alias ruby34="$RUBY34_PATH/ruby"
+alias rails34="$RUBY34_PATH/ruby $RUBY34_PATH/rails"
+alias bundle34="$RUBY34_PATH/bundle"
+alias rake34="$RUBY34_PATH/rake"
+
+# Default to Ruby 3.2 (for RecipeMemo)
+alias ruby="ruby32"
+alias rails="rails32"
+alias bundle="bundle32"
+alias rake="rake32"
+
+# Quick version switcher
+use_ruby32() {
+  alias ruby="ruby32"
+  alias rails="rails32"
+  alias bundle="bundle32"
+  alias rake="rake32"
+  echo "Switched to Ruby 3.2"
+  ruby -v
+}
+
+use_ruby34() {
+  alias ruby="ruby34"
+  alias rails="rails34"
+  alias bundle="bundle34"
+  alias rake="rake34"
+  echo "Switched to Ruby 3.4"
+  ruby -v
+}
+```
+
+**Git Bash での使用方法（RecipeMemoプロジェクト）:**
+```bash
+# プロジェクトディレクトリに移動
+cd /c/Users/kn022/RecipeMemo/RecipeMemo_AiCollegeWork
+
+# シンプルなコマンドで実行可能（デフォルトでRuby 3.2）
+rails test
+rails s
+rails console
+bundle install
+
+# モデルテストのみ
+rails test:models
+
+# コントローラテストのみ
+rails test:controllers
+
+# 特定のテストファイル
+rails test test/models/recipe_test.rb
+
+# バージョン確認
+ruby -v
+```
+
+**別の学習プロジェクト（Ruby 3.4）での使用:**
+```bash
+# Ruby 3.4に切り替え
+use_ruby34
+
+# コマンド実行
+rails test
+ruby -v
+
+# または、明示的にバージョン指定
+rails34 test
+ruby34 -v
+
+# RecipeMemo開発に戻る場合
+use_ruby32
+```
+
+**メリット:**
+- シンプルなコマンド（`rails test`）で実行可能
+- Git Bashでの開発が快適
+- バージョン切り替えが簡単
+- `RAILS_MAX_THREADS=1` が自動設定される
+
+**代替方法1: 絶対パスを使用（エイリアス設定前の方法）**
+```bash
+# テスト実行
 RAILS_MAX_THREADS=1 /c/Ruby32-x64/bin/ruby bin/rails test
 
 # モデルテストのみ
 RAILS_MAX_THREADS=1 /c/Ruby32-x64/bin/ruby bin/rails test:models
-
-# コントローラテストのみ
-RAILS_MAX_THREADS=1 /c/Ruby32-x64/bin/ruby bin/rails test:controllers
-
-# 特定のテストファイル
-RAILS_MAX_THREADS=1 /c/Ruby32-x64/bin/ruby bin/rails test test/models/recipe_test.rb
 ```
 
-**注意**:
-- `RAILS_MAX_THREADS=1` を設定してSprocketsの並列処理を無効化（エラー回避のため必須）
-- Git Bash上でテストを実行する際はこの方法が確実に動作する
-
-**方法2: cmd.exe または PowerShell を使用（その他のRailsコマンド）**
+**代替方法2: cmd.exe または PowerShell を使用**
 ```cmd
 # uruでRubyバージョンを設定
 uru 3.2
@@ -700,22 +782,17 @@ uru 3.2
 # サーバー起動
 rails server
 
-# コンソール
-rails console
-
-# マイグレーション
-rails db:migrate
-
 # テスト実行
 rails test
 
-# ジェネレータ
-rails generate model Recipe name:string
+# コンソール
+rails console
 ```
 
 **注意**:
-- cmd.exe経由でのコマンド実行は、環境によっては動作しない場合がある
-- uruが正しく設定されている場合は、直接 `rails` コマンドが使用可能
+- uruはWindows環境のRubyバージョン管理ツールだが、Git Bash環境では環境変数が正しく設定されない
+- エイリアス設定により、Git Bashでも快適に開発可能
+- cmd.exeやPowerShellではuruが正常に動作し、`rails`コマンドが直接使用可能
 
 **Git操作は Git Bash を使用**:
 ```bash
@@ -724,11 +801,6 @@ git add .
 git commit -m "message"
 git push
 ```
-
-**理由**:
-- uruはWindows環境のRubyバージョン管理ツールだが、Git Bash環境では環境変数が正しく設定されない
-- Git Bashでの絶対パス使用は、テスト実行において確実に動作する実用的な方法
-- cmd.exeやPowerShellではuruが正常に動作し、`rails`コマンドが直接使用可能（ただし環境による）
 
 ### 10.4 日本語化の設定（実装例）
 
@@ -1247,6 +1319,43 @@ Ctrl+C
 - セットアップ時間: 30-45分
 
 **注意**: これらのプラットフォームはPostgreSQLへの移行が必要です。
+
+### 11.8 Windows環境でのDockerの必要性について
+
+#### Git Bash エイリアス設定により、Dockerは必須ではない
+
+以前はWindows環境での複雑さ（uruとGit Bashの非互換性）からDockerの導入を検討していましたが、**Git Bashでのエイリアス設定（セクション10.3参照）により、ネイティブ環境でも快適に開発できます**。
+
+**エイリアス設定のメリット:**
+- シンプルなコマンドで実行可能（`rails test`）
+- Dockerのオーバーヘッドなし
+- ファイルI/Oが高速
+- セットアップが簡単（5分）
+- メモリ消費が少ない
+
+**Dockerのメリット:**
+- 環境の完全な分離
+- チーム開発での環境統一
+- 本番環境（Linux）との一致
+- データベースの簡単な管理
+
+#### 推奨する選択基準
+
+| 状況 | 推奨 | 理由 |
+|------|------|------|
+| **個人開発** | エイリアス設定 | シンプルで十分 |
+| **学習・実験** | エイリアス設定 | すぐに始められる |
+| **チーム開発** | Docker | 環境統一が重要 |
+| **本番デプロイ予定** | Docker | 本番環境に近い |
+| **複数プロジェクト** | エイリアス設定 | バージョン切り替えが簡単 |
+
+#### 段階的な移行パス
+
+1. **現在（個人開発）**: Git Bash エイリアス設定で開発
+2. **チーム開発開始時**: Dockerに移行を検討
+3. **本番デプロイ時**: 必要に応じてDocker採用
+
+**結論**: Windows環境でも、エイリアス設定により**Dockerなしで快適な開発環境が構築可能**です。Dockerは将来的な選択肢として残しつつ、まずはシンプルな環境で開発を進めることを推奨します。
 
 ---
 
